@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuruva Pavan Kumar — RTL Design &amp; Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0F17;
+    --bg-panel:#0F1826;
+    --bg-panel-2:#0D141F;
+    --grid:#182739;
+    --grid-soft:#121e2c;
+    --text:#DCE6F0;
+    --text-dim:#7E92A8;
+    --text-faint:#4E617A;
+    --teal:#4FD8C4;
+    --amber:#E8A33D;
+    --sans:'Space Grotesk', sans-serif;
+    --mono:'IBM Plex Mono', monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    background-image:
+      linear-gradient(var(--grid-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-soft) 1px, transparent 1px);
+    background-size:32px 32px;
+    color:var(--text);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:var(--teal); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--teal); outline-offset:3px;}
+
+  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+
+  /* ---------- Header / nav ---------- */
+  header{
+    position:sticky; top:0; z-index:10;
+    background:rgba(10,15,23,0.85);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--grid);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px;
+    max-width:920px; margin:0 auto;
+  }
+  .nav-mark{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--mono); font-size:13px; color:var(--text-dim);
+    letter-spacing:0.02em;
+  }
+  .nav-mark .dot{width:8px; height:8px; border-radius:50%; background:var(--teal); box-shadow:0 0 8px var(--teal);}
+  .nav-links{display:flex; gap:24px; font-family:var(--mono); font-size:13px;}
+  .nav-links a{color:var(--text-dim);}
+  .nav-links a:hover{color:var(--teal); text-decoration:none;}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:72px 0 56px;}
+  .hero-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:32px; flex-wrap:wrap;
+  }
+  .hero-text h1{
+    font-size:clamp(32px, 5vw, 46px);
+    line-height:1.15;
+    margin:0 0 12px;
+    font-weight:600;
+  }
+  .hero-role{
+    font-family:var(--mono);
+    color:var(--teal);
+    font-size:15px;
+    margin:0 0 20px;
+  }
+  .hero-desc{
+    max-width:52ch;
+    color:var(--text-dim);
+    font-size:16px;
+    line-height:1.65;
+    margin:0;
+  }
+  .hero-loc{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-faint);
+    margin-top:20px;
+  }
+
+  /* Chip diagram */
+  .chip-holder{flex-shrink:0; width:280px; max-width:100%;}
+  svg.chip{width:100%; height:auto; display:block;}
+  .chip-body{fill:var(--bg-panel); stroke:var(--grid); stroke-width:1.5;}
+  .chip-pin{stroke:var(--text-faint); stroke-width:1.5;}
+  .chip-pin.active{stroke:var(--teal);}
+  .chip-label{font-family:var(--mono); font-size:9px; fill:var(--text-dim);}
+  .chip-notch{fill:var(--bg);}
+  .pin-dot{fill:var(--amber);}
+
+  /* ---------- Section shell ---------- */
+  section{padding:56px 0; border-top:1px solid var(--grid);}
+  .section-head{
+    display:flex; align-items:baseline; gap:12px;
+    margin-bottom:32px;
+  }
+  .section-tag{
+    font-family:var(--mono); font-size:12px; color:var(--text-faint);
+  }
+  .section-head h2{
+    font-size:22px; font-weight:600; margin:0;
+  }
+
+  /* ---------- Focus areas (schematic flow) ---------- */
+  .flow{
+    display:flex; align-items:stretch; gap:0;
+    flex-wrap:wrap;
+  }
+  .flow-block{
+    flex:1 1 200px;
+    background:var(--bg-panel);
+    border:1px solid var(--grid);
+    padding:22px 20px;
+    position:relative;
+  }
+  .flow-block h3{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--amber);
+    margin:0 0 10px;
+    font-weight:500;
+  }
+  .flow-block p{
+    margin:0; font-size:14px; color:var(--text-dim); line-height:1.6;
+  }
+  .flow-arrow{
+    flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    width:36px; color:var(--text-faint); font-family:var(--mono);
+  }
+  @media (max-width:680px){
+    .flow{flex-direction:column;}
+    .flow-arrow{width:100%; height:24px; transform:rotate(90deg);}
+  }
+
+  /* ---------- Skills (pin list) ---------- */
+  .skills-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:1px;
+    background:var(--grid);
+    border:1px solid var(--grid);
+  }
+  .skill-row{
+    background:var(--bg);
+    padding:18px 20px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .skill-row .pin-mark{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--teal); flex-shrink:0;
+    box-shadow:0 0 6px var(--teal);
+  }
+  .skill-row span{font-family:var(--mono); font-size:14px; color:var(--text);}
+
+  /* ---------- Education (datasheet table) ---------- */
+  .datasheet{
+    border:1px solid var(--grid);
+    background:var(--bg-panel);
+  }
+  .ds-row{
+    display:grid;
+    grid-template-columns:140px 1fr;
+    border-bottom:1px solid var(--grid);
+    font-size:14px;
+  }
+  .ds-row:last-child{border-bottom:none;}
+  .ds-key{
+    font-family:var(--mono); font-size:12px; color:var(--text-faint);
+    padding:16px 18px; border-right:1px solid var(--grid);
+  }
+  .ds-val{padding:16px 18px; color:var(--text);}
+  .ds-val .sub{display:block; color:var(--text-dim); font-size:13px; margin-top:4px;}
+
+  /* ---------- Contact / footer ---------- */
+  .contact-panel{
+    display:flex; flex-wrap:wrap; gap:16px;
+  }
+  .contact-card{
+    flex:1 1 220px;
+    border:1px solid var(--grid);
+    background:var(--bg-panel);
+    padding:20px;
+    transition:border-color 0.15s ease;
+  }
+  .contact-card:hover{border-color:var(--teal);}
+  .contact-card .k{
+    font-family:var(--mono); font-size:11px; color:var(--text-faint);
+    margin-bottom:8px; display:block;
+  }
+  .contact-card .v{font-size:15px; color:var(--text);}
+  .contact-card a.v{color:var(--teal);}
+
+  footer{
+    padding:32px 0 48px;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-faint);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="nav-mark"><span class="dot"></span> kpk / rtl-design</div>
+    <nav class="nav-links">
+      <a href="#focus">focus</a>
+      <a href="#toolchain">toolchain</a>
+      <a href="#education">education</a>
+      <a href="#contact">contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" style="border-top:none;">
+    <div class="hero-top">
+      <div class="hero-text">
+        <h1>Kuruva Pavan Kumar</h1>
+        <p class="hero-role">RTL Design &amp; Design Verification Engineering</p>
+        <p class="hero-desc">
+          I design digital logic at the register-transfer level and verify it
+          works before it ever reaches silicon — writing RTL, building
+          testbenches, and reading waveforms until the behavior matches the spec.
+        </p>
+        <p class="hero-loc">Tirupati, Andhra Pradesh, India</p>
+      </div>
+
+      <div class="chip-holder" aria-hidden="true">
+        <svg class="chip" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+          <!-- pins left -->
+          <line class="chip-pin active" x1="0" y1="50" x2="40" y2="50"/>
+          <line class="chip-pin" x1="0" y1="90" x2="40" y2="90"/>
+          <line class="chip-pin active" x1="0" y1="130" x2="40" y2="130"/>
+          <line class="chip-pin" x1="0" y1="170" x2="40" y2="170"/>
+          <line class="chip-pin active" x1="0" y1="210" x2="40" y2="210"/>
+          <!-- pins right -->
+          <line class="chip-pin" x1="220" y1="50" x2="260" y2="50"/>
+          <line class="chip-pin active" x1="220" y1="90" x2="260" y2="90"/>
+          <line class="chip-pin" x1="220" y1="130" x2="260" y2="130"/>
+          <line class="chip-pin active" x1="220" y1="170" x2="260" y2="170"/>
+          <line class="chip-pin" x1="220" y1="210" x2="260" y2="210"/>
+          <!-- pin dots -->
+          <circle class="pin-dot" cx="4" cy="50" r="2.2"/>
+          <circle class="pin-dot" cx="4" cy="90" r="2.2"/>
+          <circle class="pin-dot" cx="4" cy="130" r="2.2"/>
+          <circle class="pin-dot" cx="4" cy="170" r="2.2"/>
+          <circle class="pin-dot" cx="4" cy="210" r="2.2"/>
+          <circle class="pin-dot" cx="256" cy="50" r="2.2"/>
+          <circle class="pin-dot" cx="256" cy="90" r="2.2"/>
+          <circle class="pin-dot" cx="256" cy="130" r="2.2"/>
+          <circle class="pin-dot" cx="256" cy="170" r="2.2"/>
+          <circle class="pin-dot" cx="256" cy="210" r="2.2"/>
+          <!-- body -->
+          <rect class="chip-body" x="40" y="30" width="180" height="200" rx="4"/>
+          <circle class="chip-notch" cx="130" cy="30" r="8"/>
+          <!-- labels -->
+          <text class="chip-label" x="130" y="95" text-anchor="middle">KPK</text>
+          <text class="chip-label" x="130" y="112" text-anchor="middle" fill="#4FD8C4">RTL·DV</text>
+          <text class="chip-label" x="130" y="200" text-anchor="middle" fill="#4E617A">B.TECH ECE</text>
+          <text class="chip-label" x="130" y="215" text-anchor="middle" fill="#4E617A">2023 — 2027</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOCUS AREAS -->
+  <section id="focus">
+    <div class="section-head">
+      <span class="section-tag">01</span>
+      <h2>Focus areas</h2>
+    </div>
+    <div class="flow">
+      <div class="flow-block">
+        <h3>RTL Design</h3>
+        <p>Writing synthesizable register-transfer-level code that describes digital logic clearly enough to implement and verify.</p>
+      </div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-block">
+        <h3>Functional Verification</h3>
+        <p>Building testbenches and simulations in ModelSim to check that a design behaves the way it's meant to, cycle by cycle.</p>
+      </div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-block">
+        <h3>FPGA Implementation</h3>
+        <p>Taking verified RTL through synthesis and implementation in Xilinx Vivado to see it run on real hardware.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLCHAIN / SKILLS -->
+  <section id="toolchain">
+    <div class="section-head">
+      <span class="section-tag">02</span>
+      <h2>Toolchain</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-row"><span class="pin-mark"></span><span>RTL Design</span></div>
+      <div class="skill-row"><span class="pin-mark"></span><span>ModelSim</span></div>
+      <div class="skill-row"><span class="pin-mark"></span><span>Xilinx Vivado</span></div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education">
+    <div class="section-head">
+      <span class="section-tag">03</span>
+      <h2>Education</h2>
+    </div>
+    <div class="datasheet">
+      <div class="ds-row">
+        <div class="ds-key">institution</div>
+        <div class="ds-val">Sri Venkateswara College of Engineering, Tirupati</div>
+      </div>
+      <div class="ds-row">
+        <div class="ds-key">program</div>
+        <div class="ds-val">Bachelor of Technology, Electronics &amp; Communication Engineering
+          <span class="sub">October 2023 — May 2027</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-head">
+      <span class="section-tag">04</span>
+      <h2>Contact</h2>
+    </div>
+    <div class="contact-panel">
+      <div class="contact-card">
+        <span class="k">phone</span>
+        <a class="v" href="tel:+919014691460">+91 90146 91460</a>
+      </div>
+      <div class="contact-card">
+        <span class="k">email</span>
+        <a class="v" href="mailto:kuruvapavankumar75@gmail.com">kuruvapavankumar75@gmail.com</a>
+      </div>
+      <div class="contact-card">
+        <span class="k">linkedin</span>
+        <a class="v" href="https://www.linkedin.com/in/kuruva-pavankumar-16b781294" target="_blank" rel="noopener">kuruva-pavankumar</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  built with signal integrity in mind
+</footer>
+
+</body>
+</html>
